@@ -1,5 +1,5 @@
 import Foundation
 
-public struct QRCodeRawData {
+public struct QRCodeRawData: Codable {
     public let qrRawString: String
 }

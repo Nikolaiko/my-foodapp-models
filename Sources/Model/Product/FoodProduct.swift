@@ -1,6 +1,6 @@
 import Foundation
 
-public struct FoodProduct: Equatable, Hashable {
+public struct FoodProduct: Equatable, Hashable, Codable {
     public let id: String
     public let name: String
     public let quantity: Int

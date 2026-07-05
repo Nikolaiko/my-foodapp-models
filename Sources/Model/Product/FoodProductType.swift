@@ -1,6 +1,6 @@
 import Foundation
 
-public enum FoodProductType: String, CaseIterable {
+public enum FoodProductType: String, CaseIterable, Codable {
     case apple = "Apple"
     case orange = "Orange"
     case tomato = "Tomato"

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct FoodRecipeProductEntry {
+public struct FoodRecipeProductEntry: Codable {
     public let id: String
     public let productType: FoodProductType
     public let count: Int

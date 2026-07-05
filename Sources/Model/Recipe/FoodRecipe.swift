@@ -1,6 +1,6 @@
 import Foundation
 
-public struct FoodRecipe {
+public struct FoodRecipe: Codable {
     public let id: String
     public let name: String
     public let shortDescription: String

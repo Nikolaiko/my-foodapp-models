@@ -1,6 +1,6 @@
 import Foundation
 
-public enum FoodQuantityType: Int, CaseIterable {
+public enum FoodQuantityType: Int, CaseIterable, Codable {
     case unknown = 0
     case weight
     case packed

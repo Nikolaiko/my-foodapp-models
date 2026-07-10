@@ -1,3 +1,4 @@
+#if canImport(SwiftUI)
 import SwiftUI
 
 public extension Color {
@@ -11,4 +12,4 @@ public extension Color {
         )
     }
 }
-
+#endif

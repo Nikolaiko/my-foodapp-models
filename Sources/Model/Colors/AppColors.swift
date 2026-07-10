@@ -1,3 +1,4 @@
+#if canImport(SwiftUI)
 import Foundation
 import SwiftUI
 
@@ -20,3 +21,5 @@ public let productCountColor = Color(hex: 0x96959A)
 
 public let whiteColor = Color.white
 public let redColor = Color.red
+#endif
+

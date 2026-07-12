@@ -3,7 +3,7 @@ import Foundation
 public struct FoodProduct: Equatable, Hashable, Codable {
     public let id: String
     public let name: String
-    public let quantity: Int
+    public let quantity: Float
     public let quantityType: FoodQuantityType
     public let type: FoodProductType
     public let date: Date
@@ -11,7 +11,7 @@ public struct FoodProduct: Equatable, Hashable, Codable {
     public init(
         id: String,
         name: String,
-        quantity: Int,
+        quantity: Float,
         quantityType: FoodQuantityType,
         type: FoodProductType,
         date: Date
@@ -27,7 +27,7 @@ public struct FoodProduct: Equatable, Hashable, Codable {
     public func copy(
         id: String? = nil,
         name: String? = nil,
-        quantity: Int? = nil,
+        quantity: Float? = nil,
         quantityType: FoodQuantityType? = nil,
         type: FoodProductType? = nil,
         date: Date? = nil

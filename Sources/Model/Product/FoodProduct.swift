@@ -41,14 +41,4 @@ public struct FoodProduct: Equatable, Hashable, Codable {
             date: date ?? self.date
         )
     }
-
-    public static func ==(lhs: FoodProduct, rhs: FoodProduct) -> Bool {
-        let calendar = Calendar.current
-        return lhs.id == rhs.id &&
-            lhs.name == rhs.name &&
-            lhs.quantity == rhs.quantity &&
-            lhs.quantityType == rhs.quantityType &&
-            lhs.type == rhs.type &&
-            calendar.compare(lhs.date, to: rhs.date, toGranularity: .day) == .orderedSame
-    }
 }

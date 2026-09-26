@@ -13,6 +13,9 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Model")
+            name: "Model"),
+        .testTarget(
+            name: "ModelTests",
+            dependencies: ["Model"]),
     ]
 )

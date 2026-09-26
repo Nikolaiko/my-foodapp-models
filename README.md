@@ -16,7 +16,7 @@ Swift Package без внешних зависимостей. Пакет `FoodMo
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/Nikolaiko/my-foodapp-models.git", .upToNextMajor(from: "1.0.7")),
+    .package(url: "https://github.com/Nikolaiko/my-foodapp-models.git", .upToNextMajor(from: "1.0.9")),
 ],
 targets: [
     .target(name: "App", dependencies: [
@@ -39,7 +39,7 @@ Sources/Model/
   Product/       FoodProduct, TableProduct, FoodProductType, FoodQuantityType
   Recipe/        FoodRecipe, FoodRecipeProductEntry
   Network/       QRCodeRawData
-  Extensions/    FoodProduct ⇄ TableProduct, Color(hex:)
+  Extensions/    FoodProduct ⇄ TableProduct, Color(hex:), начало дня по UTC
   Colors/        палитра приложения (только SwiftUI)
   Strings/       общие строки UI
   TypeAliases/   VoidCallback, DataCallback<T>
@@ -47,7 +47,7 @@ Sources/Model/
 
 | Тип | Назначение |
 |---|---|
-| `FoodProduct` | Продукт из списка запасов: `id`, `name`, `quantity: Float`, `quantityType`, `type`, `date` |
+| `FoodProduct` | Продукт из списка запасов: `id`, `name`, `quantity: Float`, `quantityType`, `type`, `date` — день покупки (начало дня по UTC) |
 | `TableProduct` | Тот же продукт + флаг `selected` — для списков с выделением в UI. Конвертация: `toTableProduct()` / `toProduct()` |
 | `FoodProductType` | Вид продукта (`apple`, `milk`, `tomato`, `greenOnion`, …, `unknown`). Raw value — `String` |
 | `FoodQuantityType` | Единица измерения: `unknown = 0`, `weight`, `packed`, `item`, `liquid`. Raw value — `Int` |
@@ -70,6 +70,8 @@ Sources/Model/
 - `FoodQuantityType` кодируется **числом**: `0` (unknown) … `4` (liquid).
 - `quantity` / `count` — `Float` (с 1.0.6–1.0.7; раньше были целыми).
 - Формат `Date` задаёт энкодер потребителя (в Vapor — ISO 8601).
+- `date` продуктов — всегда полночь по UTC (с 1.0.9): время отбрасывается
+  и при создании, и при декодировании JSON.
 
 ```json
 {
@@ -78,7 +80,7 @@ Sources/Model/
   "quantity": 1,
   "quantityType": 0,
   "type": "Tomato",
-  "date": "2026-07-12T10:00:00Z"
+  "date": "2026-07-12T00:00:00Z"
 }
 ```
 
@@ -88,11 +90,16 @@ Sources/Model/
 
 ## Особенности
 
-- **Сравнение** (`==`/`hash`) синтезировано компилятором по всем полям, дата —
-  с точностью до долей секунды. Поэтому продукт после round-trip через JSON
-  (ISO 8601 без долей секунды) может быть не равен исходному — в тестах
-  сравнивайте нужные поля или дату с допуском. Не переопределяйте `==`, не
-  переопределив согласованно `hash(into:)`.
+- **Дата продукта — день по UTC.** `FoodProduct` и `TableProduct` обрезают
+  `date` до начала дня по UTC в `init` (значит, и в `copy(...)`) и при
+  декодировании. День считается по UTC, а не по часовому поясу устройства:
+  покупка в 02:30 по UTC+6 — это ещё предыдущий день. Показывать день тоже
+  нужно в UTC (`timeZone = TimeZone(secondsFromGMT: 0)` у форматтера), иначе
+  западнее Гринвича он съедет на день назад.
+- **Сравнение** (`==`/`hash`) синтезировано компилятором по всем полям. Раз
+  дата обрезана до дня, продукты одного дня с разным временем равны, а
+  round-trip через JSON (ISO 8601) даёт равный продукт. Не переопределяйте
+  `==`, не переопределив согласованно `hash(into:)`.
 - **SwiftUI под условной компиляцией.** Всё, что импортирует SwiftUI (цвета,
   `Color(hex:)`), обёрнуто в `#if canImport(SwiftUI)`, иначе пакет не
   собирается на Linux. Новый UI-код в пакет добавляйте так же.
@@ -105,7 +112,15 @@ Sources/Model/
 | Потребитель | Как |
 |---|---|
 | [my-food-app-backend](https://github.com/Nikolaiko/my-food-app-backend) | Основной потребитель: отдаёт `FoodRecipe`/`FoodProduct` в API, `FoodProductType`/`FoodQuantityType` хранятся в БД. Добавляет к типам `Content` |
-| [ReceiptApp](https://github.com/Nikolaiko/my-food-app-ai-project) (iOS) | Пакет объявлен в `Tuist/Package.swift`, но в таргеты не подключён: у клиента свои `CommonModels`, а сетевые типы генерируются из OpenAPI-спеки |
+| [ReceiptApp](https://github.com/Nikolaiko/my-food-app-ai-project) (iOS) | Не подключает пакет (зависимость удалена): у клиента свои `CommonModels`, а сетевые типы генерируются из OpenAPI-спеки |
+
+## Тесты
+
+```bash
+swift test
+```
+
+Тесты на swift-testing — нужен Swift 6+ (сама библиотека собирается с 5.9).
 
 ## Версионирование и релиз
 
@@ -138,6 +153,7 @@ swift package update my-foodapp-models
 
 | Тег | Изменения |
 |---|---|
+| `1.0.9` | `FoodProduct`, `TableProduct`: `date` обрезается до начала дня по UTC (в `init`, `copy` и при декодировании), продукты одного дня равны |
 | `1.0.8` | `FoodProduct`: убран кастомный `==` (сравнение даты по дню нарушало контракт `Hashable`), сравнение синтезируется по всем полям |
 | `1.0.7` | `TableProduct.quantity`: `Int` → `Float` |
 | `1.0.6` | `FoodProduct.quantity` и `FoodRecipeProductEntry.count`: `Int` → `Float` |

@@ -84,8 +84,8 @@ Sources/Model/
 }
 ```
 
-Этот формат зафиксирован в OpenAPI-спеке клиента
-([`specs/backend_specs.yaml`](https://github.com/Nikolaiko/my-food-app-ai-project/blob/main/specs/backend_specs.yaml)).
+Этот формат зафиксирован в OpenAPI-спеке бэкенда
+([`specs/backend_specs.yaml`](https://github.com/Nikolaiko/my-food-app-backend/blob/main/specs/backend_specs.yaml)).
 Меняете модель — синхронно меняйте спеку.
 
 ## Особенности
